@@ -242,58 +242,58 @@ ValuePtr ObjectTemplateNewInstance(TemplatePtr ptr, ContextPtr ctx_ptr) {
 
 /********** FunctionTemplate **********/
 
-static void FunctionTemplateCallback(const FunctionCallbackInfo<Value>& info) {
-  Isolate* iso_ptr = info.GetIsolate();
-  ISOLATE_SCOPE(iso_ptr);
-
-  // This callback function can be called from any Context, which we only know
-  // at runtime. We extract the Context reference from the embedder data so that
-  // we can use the context registry to match the Context on the Go side
-  Local<Context> local_ctx = iso->GetCurrentContext();
-  int ctx_ref = local_ctx->GetEmbedderData(1).As<Integer>()->Value();
-
-  int callback_ref = info.Data().As<Integer>()->Value();
-
-  int args_count = info.Length();
-  ValuePtr args[args_count];
-  for (int i = 0; i < args_count; i++) {
-    m_value* val = new m_value;
-    val->iso = iso;
-    val->ctx.Reset(iso, local_ctx);
-    val->ptr.Reset(iso, Persistent<Value>(iso, info[i]));
-    args[i] = static_cast<ValuePtr>(val);
-  }
-
-  ValuePtr goFunctionCallback(int ctxref, int cbref, const ValuePtr* args,
-                              int args_count);
-  ValuePtr val_ptr =
-      goFunctionCallback(ctx_ref, callback_ref, args, args_count);
-  if (val_ptr != nullptr) {
-    m_value* val = static_cast<m_value*>(val_ptr);
-    info.GetReturnValue().Set(val->ptr.Get(iso));
-  } else {
-    info.GetReturnValue().SetUndefined();
-  }
-}
-
-TemplatePtr NewFunctionTemplate(IsolatePtr iso_ptr, int callback_ref) {
-  Isolate* iso = static_cast<Isolate*>(iso_ptr);
-  Locker locker(iso);
-  Isolate::Scope isolate_scope(iso);
-  HandleScope handle_scope(iso);
-
-  // (rogchap) We only need to store one value, callback_ref, into the
-  // C++ callback function data, but if we needed to store more items we could
-  // use an V8::Array; this would require the internal context from
-  // iso->GetData(0)
-  Local<Integer> cbData = Integer::New(iso, callback_ref);
-
-  m_template* ot = new m_template;
-  ot->iso = iso;
-  ot->ptr.Reset(iso,
-                FunctionTemplate::New(iso, FunctionTemplateCallback, cbData));
-  return static_cast<TemplatePtr>(ot);
-}
+//static void FunctionTemplateCallback(const FunctionCallbackInfo<Value>& info) {
+//  Isolate* iso_ptr = info.GetIsolate();
+//  ISOLATE_SCOPE(iso_ptr);
+//
+//  // This callback function can be called from any Context, which we only know
+//  // at runtime. We extract the Context reference from the embedder data so that
+//  // we can use the context registry to match the Context on the Go side
+//  Local<Context> local_ctx = iso->GetCurrentContext();
+//  int ctx_ref = local_ctx->GetEmbedderData(1).As<Integer>()->Value();
+//
+//  int callback_ref = info.Data().As<Integer>()->Value();
+//
+//  int args_count = info.Length();
+//  ValuePtr args[args_count];
+//  for (int i = 0; i < args_count; i++) {
+//    m_value* val = new m_value;
+//    val->iso = iso;
+//    val->ctx.Reset(iso, local_ctx);
+//    val->ptr.Reset(iso, Persistent<Value>(iso, info[i]));
+//    args[i] = static_cast<ValuePtr>(val);
+//  }
+//
+//  ValuePtr goFunctionCallback(int ctxref, int cbref, const ValuePtr* args,
+//                              int args_count);
+//  ValuePtr val_ptr =
+//      goFunctionCallback(ctx_ref, callback_ref, args, args_count);
+//  if (val_ptr != nullptr) {
+//    m_value* val = static_cast<m_value*>(val_ptr);
+//    info.GetReturnValue().Set(val->ptr.Get(iso));
+//  } else {
+//    info.GetReturnValue().SetUndefined();
+//  }
+//}
+//
+//TemplatePtr NewFunctionTemplate(IsolatePtr iso_ptr, int callback_ref) {
+//  Isolate* iso = static_cast<Isolate*>(iso_ptr);
+//  Locker locker(iso);
+//  Isolate::Scope isolate_scope(iso);
+//  HandleScope handle_scope(iso);
+//
+//  // (rogchap) We only need to store one value, callback_ref, into the
+//  // C++ callback function data, but if we needed to store more items we could
+//  // use an V8::Array; this would require the internal context from
+//  // iso->GetData(0)
+//  Local<Integer> cbData = Integer::New(iso, callback_ref);
+//
+//  m_template* ot = new m_template;
+//  ot->iso = iso;
+//  ot->ptr.Reset(iso,
+//                FunctionTemplate::New(iso, FunctionTemplateCallback, cbData));
+//  return static_cast<TemplatePtr>(ot);
+//}
 
 /********** Context **********/
 

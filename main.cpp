@@ -2,11 +2,9 @@
 #include "windows.h"
 #include <iostream>
 #include <GLFW/glfw3.h>
-#include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include "v8go.h"
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
 
 static const struct
 {
@@ -78,10 +76,16 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
+    Init();
+    IsolatePtr iso = NewIsolate();
+    ContextPtr ctxPtr = NewContext(iso, nullptr, 1);
+
     // rest of code goes here
     while (!glfwWindowShouldClose(window)) {
-        glClearColor(0, 0, 1, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
+        RunScript(ctxPtr, "GL.clearColor(0, 0, 1, 1);", "demo.js");
+        RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
+        // glClearColor(0, 0, 1, 1);
+        // glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

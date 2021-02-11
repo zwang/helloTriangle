@@ -6,6 +6,8 @@
 
 #include <cstdio>
 
+static GLFWwindow* secondWindow;
+
 static const struct
 {
     float x, y;
@@ -44,8 +46,14 @@ static void error_callback(int error, const char* description)
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    } else if (key == GLFW_KEY_0 && action == GLFW_PRESS && !secondWindow) {
+        secondWindow = glfwCreateWindow(640, 480, "Test 2", nullptr, nullptr);
+        if (!secondWindow) {
+            std::cerr << "Could not create second window\n";
+        }
+    }
 }
 
 int main() {
@@ -82,11 +90,22 @@ int main() {
 
     // rest of code goes here
     while (!glfwWindowShouldClose(window)) {
+        glfwMakeContextCurrent(window);
         RunScript(ctxPtr, "GL.clearColor(0, 0, 1, 1);", "demo.js");
         RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
         // glClearColor(0, 0, 1, 1);
         // glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
+
+        if (secondWindow != nullptr && !glfwWindowShouldClose(secondWindow)) {
+            glfwMakeContextCurrent(secondWindow);
+            RunScript(ctxPtr, "GL.clearColor(1, 0, 0, 1);", "demo.js");
+            RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
+            // glClearColor(0, 0, 1, 1);
+            // glClear(GL_COLOR_BUFFER_BIT);
+            glfwSwapBuffers(secondWindow);
+        }
+
         glfwPollEvents();
     }
     glfwDestroyWindow(window);

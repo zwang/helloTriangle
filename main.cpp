@@ -1,10 +1,12 @@
 #define GLFW_INCLUDE_NONE
 #include "windows.h"
 #include <iostream>
+#include <time.h>
 #include <GLFW/glfw3.h>
 #include "v8go.h"
-
 #include <cstdio>
+
+using namespace std;
 
 static GLFWwindow* secondWindow;
 
@@ -44,19 +46,26 @@ static void error_callback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
+static float color = 1;
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    } else if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+        color = (float) rand()/RAND_MAX;
     } else if (key == GLFW_KEY_0 && action == GLFW_PRESS && !secondWindow) {
-        secondWindow = glfwCreateWindow(640, 480, "Test 2", nullptr, nullptr);
+        secondWindow = glfwCreateWindow(640, 480, "Click 1 To Change Color", nullptr, nullptr);
         if (!secondWindow) {
             std::cerr << "Could not create second window\n";
         }
+        glfwSetKeyCallback(secondWindow, key_callback);
     }
 }
 
 int main() {
+
+    srand( (unsigned)time( nullptr ) );
     GLFWwindow* window;
 
     glfwSetErrorCallback(error_callback);
@@ -73,7 +82,7 @@ int main() {
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    window = glfwCreateWindow(640, 480, "Test", nullptr, nullptr);
+    window = glfwCreateWindow(640, 480, "Click 1 To Change Color", nullptr, nullptr);
     if (!window) {
         std::cerr << "Could not create window\n";
         glfwTerminate();
@@ -91,7 +100,8 @@ int main() {
     // rest of code goes here
     while (!glfwWindowShouldClose(window)) {
         glfwMakeContextCurrent(window);
-        RunScript(ctxPtr, "GL.clearColor(0, 0, 1, 1);", "demo.js");
+        std::string s1 = "GL.clearColor(0, 0, " + std::to_string(color) + ", 1);";
+        RunScript(ctxPtr, s1.c_str(), "demo.js");
         RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
         // glClearColor(0, 0, 1, 1);
         // glClear(GL_COLOR_BUFFER_BIT);
@@ -99,7 +109,8 @@ int main() {
 
         if (secondWindow != nullptr && !glfwWindowShouldClose(secondWindow)) {
             glfwMakeContextCurrent(secondWindow);
-            RunScript(ctxPtr, "GL.clearColor(1, 0, 0, 1);", "demo.js");
+            std::string s2 = "GL.clearColor("+ std::to_string(color)+ ", 0, 0, 1);";
+            RunScript(ctxPtr, s2.c_str(), "demo.js");
             RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
             // glClearColor(0, 0, 1, 1);
             // glClear(GL_COLOR_BUFFER_BIT);

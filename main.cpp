@@ -54,6 +54,16 @@ static double cursorCurrentX = 0;
 static double cursorCurrentY = 0;
 static ContextPtr ctxPtr;
 
+GLFWwindow *getGlfwWindow();
+
+int runGLFWWindow();
+
+void setCallbacks(GLFWwindow *window);
+
+void loadAndInitGame();
+
+void drawWindow(GLFWwindow *window);
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -80,17 +90,25 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     cursorCurrentY = ypos;
 }
 
-int main() {
-    srand( (unsigned)time( nullptr ) );
+ContextPtr loadAndInitGameView() {
+    IsolatePtr iso = NewIsolate();
+    ContextPtr ctxP = NewContext(iso, nullptr, 1);
+    string filePath = R"(C:\Users\zhaow\source\helloTriangle\bin\js\touchDemo\main.js)";
+    ifstream ifs(filePath);
+    string content((istreambuf_iterator<char>(ifs)), (istreambuf_iterator<char>()) );
+    RunScript(ctxP, content.c_str(), "main.js");
+    RunScript(ctxP, "initSurface();", "main.js");
+    return ctxP;
+}
+
+void setCallbacks(GLFWwindow *window) {
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
+}
+
+GLFWwindow *getGlfwWindow() {
     GLFWwindow* window;
-
-    glfwSetErrorCallback(error_callback);
-
-    if (!glfwInit()) {
-        std::cerr << "Could not init GLFW\n";
-        return 1;
-    }
-
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -99,56 +117,50 @@ int main() {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     window = glfwCreateWindow(640, 480, "Click 1 To Change Color", nullptr, nullptr);
+    return window;
+}
+
+void drawWindow(GLFWwindow *window, ContextPtr ctxP) {
+    glfwMakeContextCurrent(window);
+    RunScript(ctxP, "drawFrame();", "main.js");
+    glfwSwapBuffers(window);
+}
+
+int main() {
+    return runGLFWWindow();
+}
+
+int runGLFWWindow() {
+    srand((unsigned)time(nullptr ) );
+    if (!glfwInit()) {
+        cerr << "Could not init GLFW\n";
+        return 1;
+    }
+    glfwSetErrorCallback(error_callback);
+
+    GLFWwindow *window = getGlfwWindow();
+
     if (!window) {
-        std::cerr << "Could not create window\n";
+        cerr << "Could not create window\n";
         glfwTerminate();
         return -1;
     }
 
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetMouseButtonCallback(window, mouse_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
+    setCallbacks(window);
 
     glfwMakeContextCurrent(window);
 
     Init();
-    IsolatePtr iso = NewIsolate();
-    ctxPtr = NewContext(iso, nullptr, 1);
-    ValuePtr global = ContextGlobal(ctxPtr);
-
-    std::string filePath = R"(C:\Users\zhaow\source\helloTriangle\bin\js\touchDemo\main.js)";
-
-    std::ifstream ifs(filePath);
-    std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                         (std::istreambuf_iterator<char>()    ) );
-    RunScript(ctxPtr, content.c_str(), "main.js");
-    RunScript(ctxPtr, "initSurface();", "main.js");
+    ctxPtr = loadAndInitGameView();
 
     // rest of code goes here
     while (!glfwWindowShouldClose(window)) {
-        glfwMakeContextCurrent(window);
-        //std::string s1 = "GL.clearColor(0, 0, " + std::to_string(color) + ", 1);";
-        //RunScript(ctxPtr, s1.c_str(), "demo.js");
-        //RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
-        RunScript(ctxPtr, "drawFrame();", "main.js");
-        // glClearColor(0, 0, 1, 1);
-        // glClear(GL_COLOR_BUFFER_BIT);
-
-        glfwSwapBuffers(window);
-
-        if (secondWindow != nullptr && !glfwWindowShouldClose(secondWindow)) {
-            glfwMakeContextCurrent(secondWindow);
-            std::string s2 = "GL.clearColor("+ std::to_string(color)+ ", 0, 0, 1);";
-            RunScript(ctxPtr, s2.c_str(), "demo.js");
-            RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
-            // glClearColor(0, 0, 1, 1);
-            // glClear(GL_COLOR_BUFFER_BIT);
-            glfwSwapBuffers(secondWindow);
-        }
-
+        drawWindow(window, ctxPtr);
         glfwPollEvents();
     }
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
+
+

@@ -123,21 +123,21 @@ function resize(width, height) {
 
 function drawFrame() {
     beginFrame()
-    var th = 5;
-    var hh = Math.floor(th / 2);
+    let th = 5;
+    let hh = Math.floor(th / 2);
     // plato.log("drawFrame, hh: " + hh);
     drawRect(0, 20 - hh, this.width, th, [1, 0, 1, 1]);
     drawRect(0, this.height - hh, this.width, th, [0, 1, 0, 1]);
-    var kbY = this.height - hh;
+    let kbY = this.height - hh;
     // plato.log("drawFrame, kbY: " + kbY);
     drawRect(0, kbY, this.width, th, [0, 1, 1, 1]);
-    var rh = Math.floor(this.height * 0.25);
+    let rh = Math.floor(this.height * 0.25);
     //plato.log("drawFrame, rh: " + rh);
     drawRect(0, this.height / 2 - rh / 2, this.width, rh, [0, 0, 1, 1]);
 
     var i;
     for (i = 0; i < boxes.length; i++) {
-        var box = boxes[i];
+        let box = boxes[i];
         drawRect(box.x, box.y, box.width, box.height, box.color);
     }
 }

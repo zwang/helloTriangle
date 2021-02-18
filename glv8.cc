@@ -8,44 +8,12 @@
 #include <GLES2/gl2.h>
 #endif
 #include "v8.h"
+#include "util.h"
 using namespace v8;
 
 extern bool sonic_gl_error_check;
 
 #define GL_STENCIL_INDEX 0x1901
-
-#define ParameterCheckFailed(isolate) { \
-        std::string argsStr = "";\
-        for (int c = 0; c < args.Length(); ++c) {\
-            String::Utf8Value arg_utf8(isolate, args[c]);\
-            std::string arg(*arg_utf8);\
-            argsStr += arg;\
-            if (c != args.Length() - 1) {\
-                argsStr += ", ";\
-            }\
-        }\
-        char buff[256]; sprintf( buff, "function: %s; args: %s; parameter check failed;",  __FUNCTION__, argsStr.c_str()); \
-        fprintf(stderr, "function: %s; args: %s; parameter check failed;\n",  __FUNCTION__, argsStr.c_str());\
-        isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, buff).ToLocalChecked()));\
-}
-
-#define THROW_ON_GL_ERROR(isolate) { \
-    int errno;\
-    if (sonic_gl_error_check && (errno = glGetError()) != GL_NO_ERROR) {\
-        std::string argsStr = "";\
-        for (int c = 0; c < args.Length(); ++c) {\
-            String::Utf8Value arg_utf8(isolate, args[c]);\
-            std::string arg(*arg_utf8);\
-            argsStr += arg;\
-            if (c != args.Length() - 1) {\
-                argsStr += ", ";\
-            }\
-        }\
-        char buff[256]; sprintf( buff, "function: %s; args: %s; gl error: %d;",  __FUNCTION__, argsStr.c_str(), errno ); \
-        fprintf(stderr, "function: %s; args: %s; gl error: %d;\n",  __FUNCTION__, argsStr.c_str(), errno ); \
-        isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, buff).ToLocalChecked()));\
-    }\
-}
 
 static void glActiveTexture_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();

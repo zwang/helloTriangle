@@ -60,7 +60,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     } else if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
         color = (float) rand()/RAND_MAX;
     } else if (key == GLFW_KEY_0 && action == GLFW_PRESS && !secondWindow) {
-        secondWindow = glfwCreateWindow(640, 480, "Click 1 To Change Color", nullptr, nullptr);
+        secondWindow = glfwCreateWindow(640, 480, "Click Demo", nullptr, nullptr);
         if (!secondWindow) {
             std::cerr << "Could not create second window\n";
         }

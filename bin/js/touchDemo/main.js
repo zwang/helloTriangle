@@ -6,6 +6,42 @@ var uResolution = 0;
 var uColor = 0;
 var aPosition = 0;
 
+let BoxSize = 50;
+
+var boxes = [];
+
+function distance(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+function addBox(x, y) {
+    boxes.push({
+        x: x - BoxSize,
+        y: y - BoxSize,
+        width: BoxSize,
+        height: BoxSize,
+        color: [
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            1,
+        ],
+    });
+    plato.log("after addBox: " + boxes);
+    drawFrame();
+}
+
+function clearBoxes() {
+    boxes.length = 0;
+    drawFrame();
+}
+
+function onClick(posX, posY) {
+    plato.log("onClick(x: " + posX + ", " + posY + ")");
+    clearBoxes()
+    addBox(posX, posY);
+}
+
 function initSurface() {
     plato.log("SURFACE CREATE", 1);
     init(1, 1, 0, 1);
@@ -90,14 +126,20 @@ function drawFrame() {
     var th = 5;
     var hh = Math.floor(th / 2);
     // plato.log("drawFrame, hh: " + hh);
-    drawRect(0, 20 - hh, this.width, th, 1, 0, 1, 1);
-    drawRect(0, this.height - hh, this.width, th, 0, 1, 0, 1);
+    drawRect(0, 20 - hh, this.width, th, [1, 0, 1, 1]);
+    drawRect(0, this.height - hh, this.width, th, [0, 1, 0, 1]);
     var kbY = this.height - hh;
-    plato.log("drawFrame, kbY: " + kbY);
-    drawRect(0, kbY, this.width, th, 0, 1, 1, 1);
+    // plato.log("drawFrame, kbY: " + kbY);
+    drawRect(0, kbY, this.width, th, [0, 1, 1, 1]);
     var rh = Math.floor(this.height * 0.25);
-    plato.log("drawFrame, rh: " + rh);
-    drawRect(0, this.height / 2 - rh / 2, this.width, rh, 0, 0, 1, 1);
+    //plato.log("drawFrame, rh: " + rh);
+    drawRect(0, this.height / 2 - rh / 2, this.width, rh, [0, 0, 1, 1]);
+
+    var i;
+    for (i = 0; i < boxes.length; i++) {
+        var box = boxes[i];
+        drawRect(box.x, box.y, box.width, box.height, box.color);
+    }
 }
 
 function beginFrame() {
@@ -106,7 +148,7 @@ function beginFrame() {
     GL.uniform2f(this.uResolution, this.width, this.height);
 }
 
-function drawRect(x, y, w, h, r, g, b, a) {
+function drawRect(x, y, w, h, colorArray) {
     const geom = new Float32Array([
         x, y,
         x + w, y,
@@ -116,11 +158,11 @@ function drawRect(x, y, w, h, r, g, b, a) {
         x, y,
     ]);
 
-    plato.log("vertexBuffer: " + vertexBuffer)
+    // plato.log("vertexBuffer: " + vertexBuffer)
     GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexBuffer);
     GL.bufferData(GL.ARRAY_BUFFER, geom.byteLength, geom, GL.STATIC_DRAW);
 
-    GL.uniform4f(this.uColor, r, g, b, a);
+    GL.uniform4f(this.uColor, colorArray[0], colorArray[1], colorArray[2], colorArray[3]);
 
     GL.enableVertexAttribArray(this.aPosition);
     GL.vertexAttribPointer(this.aPosition, 2, GL.FLOAT, false, 0, 0);

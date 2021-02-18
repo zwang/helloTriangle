@@ -45,15 +45,16 @@ static const char* fragment_shader_text =
         "    gl_FragColor = vec4(color, 1.0);\n"
         "}\n";
 
-static void error_callback(int error, const char* description)
-{
+static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
 static float color = 1;
+static double cursorCurrentX = 0;
+static double cursorCurrentY = 0;
+static ContextPtr ctxPtr;
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     } else if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
@@ -65,6 +66,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         }
         glfwSetKeyCallback(secondWindow, key_callback);
     }
+}
+
+static void mouse_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        std::string s2 = "onClick("+ std::to_string(cursorCurrentX) + "," +std::to_string(cursorCurrentY) + ")";
+        RunScript(ctxPtr, s2.c_str(), "main.js");
+    }
+}
+
+static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+    cursorCurrentX = xpos;
+    cursorCurrentY = ypos;
 }
 
 int main() {
@@ -93,12 +106,14 @@ int main() {
     }
 
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
 
     glfwMakeContextCurrent(window);
 
     Init();
     IsolatePtr iso = NewIsolate();
-    ContextPtr ctxPtr = NewContext(iso, nullptr, 1);
+    ctxPtr = NewContext(iso, nullptr, 1);
     ValuePtr global = ContextGlobal(ctxPtr);
 
     std::string filePath = R"(C:\Users\zhaow\source\helloTriangle\bin\js\touchDemo\main.js)";

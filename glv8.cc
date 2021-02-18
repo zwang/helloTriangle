@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#define GL_SILENCE_DEPRECATION
 #if defined(__APPLE__)
+#define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl.h>
 #endif
 #if defined(_WIN32)
@@ -8,12 +8,26 @@
 #include <GLES2/gl2.h>
 #endif
 #include "v8.h"
-#include "JSInterface.h"
 using namespace v8;
 
 extern bool sonic_gl_error_check;
 
 #define GL_STENCIL_INDEX 0x1901
+
+#define ParameterCheckFailed(isolate) { \
+        std::string argsStr = "";\
+        for (int c = 0; c < args.Length(); ++c) {\
+            String::Utf8Value arg_utf8(isolate, args[c]);\
+            std::string arg(*arg_utf8);\
+            argsStr += arg;\
+            if (c != args.Length() - 1) {\
+                argsStr += ", ";\
+            }\
+        }\
+        char buff[256]; sprintf( buff, "function: %s; args: %s; parameter check failed;",  __FUNCTION__, argsStr.c_str()); \
+        fprintf(stderr, "function: %s; args: %s; parameter check failed;\n",  __FUNCTION__, argsStr.c_str());\
+        isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, buff).ToLocalChecked()));\
+}
 
 #define THROW_ON_GL_ERROR(isolate) { \
     int errno;\
@@ -27,7 +41,8 @@ extern bool sonic_gl_error_check;
                 argsStr += ", ";\
             }\
         }\
-        char buff[256]; sprintf( buff, "function: %s; args: %s; gl error: %d;",  __FUNCTION__, argsStr.c_str(), errno );\
+        char buff[256]; sprintf( buff, "function: %s; args: %s; gl error: %d;",  __FUNCTION__, argsStr.c_str(), errno ); \
+        fprintf(stderr, "function: %s; args: %s; gl error: %d;\n",  __FUNCTION__, argsStr.c_str(), errno ); \
         isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, buff).ToLocalChecked()));\
     }\
 }
@@ -36,7 +51,7 @@ static void glActiveTexture_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glActiveTexture(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -48,7 +63,7 @@ static void glAttachShader_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glAttachShader(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -61,7 +76,7 @@ static void glBindAttribLocation_binder(const FunctionCallbackInfo<Value>& args)
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	String::Utf8Value _utf0(isolate, arg_2);
@@ -74,7 +89,7 @@ static void glBindBuffer_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBindBuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -86,7 +101,7 @@ static void glBindFramebuffer_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBindFramebuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -98,7 +113,7 @@ static void glBindRenderbuffer_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBindRenderbuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -110,7 +125,7 @@ static void glBindTexture_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBindTexture(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -124,7 +139,7 @@ static void glBlendColor_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsNumber() && arg_1->IsNumber() && arg_2->IsNumber() && arg_3->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBlendColor((float) arg_0->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_3->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -135,7 +150,7 @@ static void glBlendEquation_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBlendEquation(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -147,7 +162,7 @@ static void glBlendEquationSeparate_binder(const FunctionCallbackInfo<Value>& ar
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBlendEquationSeparate(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -159,7 +174,7 @@ static void glBlendFunc_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBlendFunc(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -173,7 +188,7 @@ static void glBlendFuncSeparate_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glBlendFuncSeparate(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -187,7 +202,7 @@ static void glBufferData_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents1 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -202,7 +217,7 @@ static void glBufferSubData_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents2 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -214,7 +229,7 @@ static void glCheckFramebufferStatus_binder(const FunctionCallbackInfo<Value>& a
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Integer::New(isolate, glCheckFramebufferStatus(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -225,7 +240,7 @@ static void glClear_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glClear(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -239,7 +254,7 @@ static void glClearColor_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsNumber() && arg_1->IsNumber() && arg_2->IsNumber() && arg_3->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glClearColor((float) arg_0->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_3->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -250,7 +265,7 @@ static void glClearDepthf_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	#if defined(_WIN32)
@@ -267,7 +282,7 @@ static void glClearStencil_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glClearStencil(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -281,7 +296,7 @@ static void glColorMask_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsBoolean() && arg_1->IsBoolean() && arg_2->IsBoolean() && arg_3->IsBoolean()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glColorMask(arg_0->BooleanValue(args.GetIsolate()), arg_1->BooleanValue(args.GetIsolate()), arg_2->BooleanValue(args.GetIsolate()), arg_3->BooleanValue(args.GetIsolate()));
@@ -292,7 +307,7 @@ static void glCompileShader_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glCompileShader(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -310,7 +325,7 @@ static void glCompressedTexImage2D_binder(const FunctionCallbackInfo<Value>& arg
 	Local<Value> arg_6 = args[6];
 	Local<Value> arg_7 = args[7];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32() && arg_5->IsInt32() && arg_6->IsInt32() && arg_7->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents3 = Local<TypedArray>::Cast(arg_7)->Buffer()->GetContents();
@@ -330,7 +345,7 @@ static void glCompressedTexSubImage2D_binder(const FunctionCallbackInfo<Value>& 
 	Local<Value> arg_7 = args[7];
 	Local<Value> arg_8 = args[8];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32() && arg_5->IsInt32() && arg_6->IsInt32() && arg_7->IsInt32() && arg_8->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents4 = Local<TypedArray>::Cast(arg_8)->Buffer()->GetContents();
@@ -349,7 +364,7 @@ static void glCopyTexImage2D_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_6 = args[6];
 	Local<Value> arg_7 = args[7];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32() && arg_5->IsInt32() && arg_6->IsInt32() && arg_7->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glCopyTexImage2D(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_4->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_5->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_6->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_7->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -367,7 +382,7 @@ static void glCopyTexSubImage2D_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_6 = args[6];
 	Local<Value> arg_7 = args[7];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32() && arg_5->IsInt32() && arg_6->IsInt32() && arg_7->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glCopyTexSubImage2D(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_4->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_5->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_6->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_7->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -384,7 +399,7 @@ static void glCreateShader_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Integer::New(isolate, glCreateShader(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -395,7 +410,7 @@ static void glCullFace_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glCullFace(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -407,7 +422,7 @@ static void glDeleteBuffers_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents5 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -420,7 +435,7 @@ static void glDeleteFramebuffers_binder(const FunctionCallbackInfo<Value>& args)
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents6 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -432,7 +447,7 @@ static void glDeleteProgram_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDeleteProgram(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -444,7 +459,7 @@ static void glDeleteRenderbuffers_binder(const FunctionCallbackInfo<Value>& args
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents7 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -456,7 +471,7 @@ static void glDeleteShader_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDeleteShader(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -468,7 +483,7 @@ static void glDeleteTextures_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents8 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -480,7 +495,7 @@ static void glDepthFunc_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDepthFunc(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -491,7 +506,7 @@ static void glDepthMask_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsBoolean()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDepthMask(arg_0->BooleanValue(args.GetIsolate()));
@@ -503,7 +518,7 @@ static void glDepthRangef_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsNumber() && arg_1->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 
@@ -521,7 +536,7 @@ static void glDetachShader_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDetachShader(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -532,7 +547,7 @@ static void glDisable_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDisable(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -543,7 +558,7 @@ static void glDisableVertexAttribArray_binder(const FunctionCallbackInfo<Value>&
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDisableVertexAttribArray(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -556,7 +571,7 @@ static void glDrawArrays_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDrawArrays(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -570,7 +585,7 @@ static void glDrawElements_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32())) {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glDrawElements(args[0]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[1]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[2]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (GLvoid *) (size_t) args[3]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -581,7 +596,7 @@ static void glEnable_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glEnable(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -592,7 +607,7 @@ static void glEnableVertexAttribArray_binder(const FunctionCallbackInfo<Value>& 
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glEnableVertexAttribArray(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -618,7 +633,7 @@ static void glFramebufferRenderbuffer_binder(const FunctionCallbackInfo<Value>& 
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glFramebufferRenderbuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -633,7 +648,7 @@ static void glFramebufferTexture2D_binder(const FunctionCallbackInfo<Value>& arg
 	Local<Value> arg_3 = args[3];
 	Local<Value> arg_4 = args[4];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glFramebufferTexture2D(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_4->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -644,7 +659,7 @@ static void glFrontFace_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glFrontFace(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -656,7 +671,7 @@ static void glGenBuffers_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents9 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -668,7 +683,7 @@ static void glGenerateMipmap_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glGenerateMipmap(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -680,7 +695,7 @@ static void glGenFramebuffers_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents10 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -693,7 +708,7 @@ static void glGenRenderbuffers_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents11 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -706,7 +721,7 @@ static void glGenTextures_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents12 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -724,7 +739,7 @@ static void glGetActiveAttrib_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_5 = args[5];
 	Local<Value> arg_6 = args[6];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsTypedArray() && arg_4->IsTypedArray() && arg_5->IsTypedArray() && arg_6->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents13 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -745,7 +760,7 @@ static void glGetActiveUniform_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_5 = args[5];
 	Local<Value> arg_6 = args[6];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsTypedArray() && arg_4->IsTypedArray() && arg_5->IsTypedArray() && arg_6->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents17 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -763,7 +778,7 @@ static void glGetAttachedShaders_binder(const FunctionCallbackInfo<Value>& args)
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray() && arg_3->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents21 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -777,7 +792,7 @@ static void glGetAttribLocation_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	String::Utf8Value _utf23(isolate, arg_1);
@@ -790,7 +805,7 @@ static void glGetBooleanv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents24 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -804,7 +819,7 @@ static void glGetBufferParameteriv_binder(const FunctionCallbackInfo<Value>& arg
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents25 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -823,7 +838,7 @@ static void glGetFloatv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents26 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -838,7 +853,7 @@ static void glGetFramebufferAttachmentParameteriv_binder(const FunctionCallbackI
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents27 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -851,7 +866,7 @@ static void glGetIntegerv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents28 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -865,7 +880,7 @@ static void glGetProgramiv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents29 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -880,7 +895,7 @@ static void glGetProgramInfoLog_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray() && arg_3->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents30 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -895,7 +910,7 @@ static void glGetRenderbufferParameteriv_binder(const FunctionCallbackInfo<Value
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents32 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -909,7 +924,7 @@ static void glGetShaderiv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents33 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -928,7 +943,7 @@ static void glGetShaderInfoLog_binder(const FunctionCallbackInfo<Value>& args) {
     Local<Value> arg_2 = args[2];
     Local<Value> arg_3 = args[3];
     if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray() && arg_3->IsString())) {
-        JSInterface::ParameterCheckFailed(isolate);
+        ParameterCheckFailed(isolate)
         return;
     }
     ArrayBuffer::Contents contents34 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -966,7 +981,7 @@ static void glGetShaderSource_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray() && arg_3->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents38 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -979,7 +994,7 @@ static void glGetString_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32())) {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(
@@ -996,7 +1011,7 @@ static void glGetTexParameterfv_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents40 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1010,7 +1025,7 @@ static void glGetTexParameteriv_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents41 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1024,7 +1039,7 @@ static void glGetUniformfv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents42 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1038,7 +1053,7 @@ static void glGetUniformiv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents43 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1051,7 +1066,7 @@ static void glGetUniformLocation_binder(const FunctionCallbackInfo<Value>& args)
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsString()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	String::Utf8Value _utf44(isolate, arg_1);
@@ -1065,7 +1080,7 @@ static void glGetVertexAttribfv_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents45 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1079,7 +1094,7 @@ static void glGetVertexAttribiv_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents46 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1093,7 +1108,7 @@ static void glHint_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glHint(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1104,7 +1119,7 @@ static void glIsBuffer_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsBuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1115,7 +1130,7 @@ static void glIsEnabled_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsEnabled(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1126,7 +1141,7 @@ static void glIsFramebuffer_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsFramebuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1137,7 +1152,7 @@ static void glIsProgram_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsProgram(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1148,7 +1163,7 @@ static void glIsRenderbuffer_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsRenderbuffer(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1159,7 +1174,7 @@ static void glIsShader_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsShader(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1170,7 +1185,7 @@ static void glIsTexture_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	args.GetReturnValue().Set(Boolean::New(isolate, glIsTexture(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust())));
@@ -1181,7 +1196,7 @@ static void glLineWidth_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glLineWidth((float) arg_0->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1192,7 +1207,7 @@ static void glLinkProgram_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glLinkProgram(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1204,7 +1219,7 @@ static void glPixelStorei_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glPixelStorei(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1216,7 +1231,7 @@ static void glPolygonOffset_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsNumber() && arg_1->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glPolygonOffset((float) arg_0->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1233,7 +1248,7 @@ static void glReadPixels_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_5 = args[5];
 	Local<Value> arg_6 = args[6];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32() && arg_5->IsInt32() && arg_6->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents47 = Local<TypedArray>::Cast(arg_6)->Buffer()->GetContents();
@@ -1248,7 +1263,7 @@ static void glRenderbufferStorage_binder(const FunctionCallbackInfo<Value>& args
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glRenderbufferStorage(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1260,7 +1275,7 @@ static void glSampleCoverage_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsNumber() && arg_1->IsBoolean()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glSampleCoverage((float) arg_0->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(),
@@ -1275,7 +1290,7 @@ static void glScissor_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glScissor(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1287,7 +1302,7 @@ static void glShaderSource_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsString())) {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	String::Utf8Value String_1(isolate, arg_1);
@@ -1302,7 +1317,7 @@ static void glStencilFunc_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glStencilFunc(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1316,7 +1331,7 @@ static void glStencilFuncSeparate_binder(const FunctionCallbackInfo<Value>& args
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glStencilFuncSeparate(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1327,7 +1342,7 @@ static void glStencilMask_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glStencilMask(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1339,7 +1354,7 @@ static void glStencilMaskSeparate_binder(const FunctionCallbackInfo<Value>& args
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glStencilMaskSeparate(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1352,7 +1367,7 @@ static void glStencilOp_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glStencilOp(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1366,7 +1381,7 @@ static void glStencilOpSeparate_binder(const FunctionCallbackInfo<Value>& args) 
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glStencilOpSeparate(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1377,11 +1392,11 @@ static void glTexImage2D_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	for (int c = 0; c < 8; ++c) {
 		if (!args[c]->IsInt32()) {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	}
-	glTexImage2D(args[0]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[1]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[2]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[3]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[4]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[5]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[6]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[7]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[8]->IsTypedArray() ? (GLvoid*) Local<TypedArray>::Cast(args[8])->Buffer()->GetContents().Data() : NULL);
+	glTexImage2D(args[0]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[1]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[2]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[3]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[4]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[5]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[6]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[7]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[8]->IsTypedArray() ? (GLvoid*) Local<TypedArray>::Cast(args[8])->Buffer()->GetContents().Data() : nullptr);
 	THROW_ON_GL_ERROR(isolate)
 
 }
@@ -1391,7 +1406,7 @@ static void glTexParameterf_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glTexParameterf(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1404,7 +1419,7 @@ static void glTexParameterfv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents50 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1418,7 +1433,7 @@ static void glTexParameteri_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glTexParameteri(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1431,7 +1446,7 @@ static void glTexParameteriv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents51 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1451,7 +1466,7 @@ static void glTexSubImage2D_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_7 = args[7];
 	Local<Value> arg_8 = args[8];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32() && arg_5->IsInt32() && arg_6->IsInt32() && arg_7->IsInt32() && arg_8->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents52 = Local<TypedArray>::Cast(arg_8)->Buffer()->GetContents();
@@ -1464,7 +1479,7 @@ static void glUniform1f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform1f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1477,7 +1492,7 @@ static void glUniform1fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents53 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1490,7 +1505,7 @@ static void glUniform1i_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform1i(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1503,7 +1518,7 @@ static void glUniform1iv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents54 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1517,7 +1532,7 @@ static void glUniform2f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber() && arg_2->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform2f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1530,7 +1545,7 @@ static void glUniform2fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents55 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1544,7 +1559,7 @@ static void glUniform2i_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform2i(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1557,7 +1572,7 @@ static void glUniform2iv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents56 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1572,7 +1587,7 @@ static void glUniform3f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber() && arg_2->IsNumber() && arg_3->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform3f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_3->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1585,7 +1600,7 @@ static void glUniform3fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents57 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1600,7 +1615,7 @@ static void glUniform3i_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform3i(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1613,7 +1628,7 @@ static void glUniform3iv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents58 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1629,7 +1644,7 @@ static void glUniform4f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_3 = args[3];
 	Local<Value> arg_4 = args[4];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber() && arg_2->IsNumber() && arg_3->IsNumber() && arg_4->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform4f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_3->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_4->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1642,7 +1657,7 @@ static void glUniform4fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents59 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1658,7 +1673,7 @@ static void glUniform4i_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_3 = args[3];
 	Local<Value> arg_4 = args[4];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32() && arg_4->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUniform4i(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_4->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1671,7 +1686,7 @@ static void glUniform4iv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents60 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1686,7 +1701,7 @@ static void glUniformMatrix2fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsBoolean() && arg_3->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents61 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -1705,7 +1720,7 @@ static void glUniformMatrix3fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsBoolean() && arg_3->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents62 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -1724,7 +1739,7 @@ static void glUniformMatrix4fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsBoolean() && arg_3->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents63 = Local<TypedArray>::Cast(arg_3)->Buffer()->GetContents();
@@ -1740,7 +1755,7 @@ static void glUseProgram_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glUseProgram(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1751,7 +1766,7 @@ static void glValidateProgram_binder(const FunctionCallbackInfo<Value>& args) {
 	Isolate *isolate = args.GetIsolate();
 	Local<Value> arg_0 = args[0];
 	if (!(arg_0->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glValidateProgram(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1763,7 +1778,7 @@ static void glVertexAttrib1f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glVertexAttrib1f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1775,7 +1790,7 @@ static void glVertexAttrib1fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents64 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -1789,7 +1804,7 @@ static void glVertexAttrib2f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_1 = args[1];
 	Local<Value> arg_2 = args[2];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber() && arg_2->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glVertexAttrib2f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1801,7 +1816,7 @@ static void glVertexAttrib2fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents65 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -1816,7 +1831,7 @@ static void glVertexAttrib3f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber() && arg_2->IsNumber() && arg_3->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glVertexAttrib3f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_3->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1828,7 +1843,7 @@ static void glVertexAttrib3fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents66 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -1844,7 +1859,7 @@ static void glVertexAttrib4f_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_3 = args[3];
 	Local<Value> arg_4 = args[4];
 	if (!(arg_0->IsInt32() && arg_1->IsNumber() && arg_2->IsNumber() && arg_3->IsNumber() && arg_4->IsNumber()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glVertexAttrib4f(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_1->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_2->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_3->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust(), (float) arg_4->NumberValue(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1856,7 +1871,7 @@ static void glVertexAttrib4fv_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_0 = args[0];
 	Local<Value> arg_1 = args[1];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents67 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -1873,7 +1888,7 @@ static void glVertexAttribPointer_binder(const FunctionCallbackInfo<Value>& args
 	Local<Value> arg_4 = args[4];
 	Local<Value> arg_5 = args[5];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsBoolean() && arg_4->IsInt32() && arg_5->IsInt32())) {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glVertexAttribPointer(args[0]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[1]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[2]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), args[3]->BooleanValue(args.GetIsolate()), args[4]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), (GLvoid *) (size_t) args[5]->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1887,7 +1902,7 @@ static void glViewport_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_2 = args[2];
 	Local<Value> arg_3 = args[3];
 	if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsInt32() && arg_3->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	glViewport(arg_0->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_1->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_2->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust(), arg_3->Int32Value(args.GetIsolate()->GetCurrentContext()).FromJust());
@@ -1902,7 +1917,7 @@ static void glGetShaderPrecisionFormat_binder(const FunctionCallbackInfo<Value>&
     Local<Value> arg_2 = args[2];
     Local<Value> arg_3 = args[3];
     if (!(arg_0->IsInt32() && arg_1->IsInt32() && arg_2->IsTypedArray() && arg_3->IsTypedArray()))  {
-        JSInterface::ParameterCheckFailed(isolate);
+        ParameterCheckFailed(isolate)
         return;
     }
     ArrayBuffer::Contents contents36 = Local<TypedArray>::Cast(arg_2)->Buffer()->GetContents();
@@ -1925,7 +1940,7 @@ static void glShaderBinary_binder(const FunctionCallbackInfo<Value>& args) {
 	Local<Value> arg_3 = args[3];
 	Local<Value> arg_4 = args[4];
 	if (!(arg_0->IsInt32() && arg_1->IsTypedArray() && arg_2->IsInt32() && arg_3->IsTypedArray() && arg_4->IsInt32()))  {
-		JSInterface::ParameterCheckFailed(isolate);
+		ParameterCheckFailed(isolate)
 		return;
 	}
 	ArrayBuffer::Contents contents48 = Local<TypedArray>::Cast(arg_1)->Buffer()->GetContents();
@@ -1935,6 +1950,23 @@ static void glShaderBinary_binder(const FunctionCallbackInfo<Value>& args) {
 }
 
 #endif
+
+static void log_binder(const FunctionCallbackInfo<Value>& args) {
+    Isolate *isolate = args.GetIsolate();
+    Local<Value> arg_0 = args[0];
+    if (!arg_0->IsString()) {
+        ParameterCheckFailed(isolate)
+        return;
+    }
+
+    v8::String::Utf8Value str(isolate, args[0]);
+    std::string cppStr(*str);
+    fprintf(stdout, "Log: %s\n", cppStr.c_str());
+}
+
+void bindPlato(Isolate *isolate, Local<ObjectTemplate> &plato) {
+    plato->Set(isolate, "log", FunctionTemplate::New(isolate, log_binder));
+}
 
 void bindGL(Isolate *isolate, Local<ObjectTemplate> &gl) {
 	gl->Set(isolate, "DEPTH_BUFFER_BIT", Integer::New(isolate, GL_DEPTH_BUFFER_BIT));

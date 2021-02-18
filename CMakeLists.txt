@@ -10,5 +10,5 @@ include_directories(include)
 
 link_directories(bin)
 
-add_executable(helloTriangle main.cpp JSInterface.cpp v8go.cc glv8.cc)
+add_executable(helloTriangle main.cpp v8go.cc glv8.cc)
 target_link_libraries(helloTriangle glfw3.dll libEGL.dll libGLESv2.dll d3dcompiler_47.dll libv8.dll libv8_libplatform.dll libwinpthread-1.dll)

@@ -18,8 +18,6 @@
 
 using namespace v8;
 
-bool sonic_gl_error_check = true;
-
 auto default_platform = platform::NewDefaultPlatform();
 auto default_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
 
@@ -322,6 +320,10 @@ ContextPtr NewContext(IsolatePtr iso_ptr,
   } else {
     global_template = ObjectTemplate::New(iso);
   }
+
+  Local<ObjectTemplate> plato = ObjectTemplate::New(iso);
+  global_template->Set(String::NewFromUtf8(iso, "plato").ToLocalChecked(), plato);
+  bindPlato(iso, plato);
 
   Local<ObjectTemplate> gl = ObjectTemplate::New(iso);
   global_template->Set(String::NewFromUtf8(iso, "GL").ToLocalChecked(), gl);

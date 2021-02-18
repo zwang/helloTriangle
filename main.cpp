@@ -5,10 +5,14 @@
 #include <GLFW/glfw3.h>
 #include "v8go.h"
 #include <cstdio>
-
+#include <fstream>
+#include "v8.h"
+using namespace v8;
 using namespace std;
 
 static GLFWwindow* secondWindow;
+
+bool sonic_gl_error_check = true;
 
 static const struct
 {
@@ -64,7 +68,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 int main() {
-
     srand( (unsigned)time( nullptr ) );
     GLFWwindow* window;
 
@@ -96,15 +99,26 @@ int main() {
     Init();
     IsolatePtr iso = NewIsolate();
     ContextPtr ctxPtr = NewContext(iso, nullptr, 1);
+    ValuePtr global = ContextGlobal(ctxPtr);
+
+    std::string filePath = R"(C:\Users\zhaow\source\helloTriangle\bin\js\touchDemo\main.js)";
+
+    std::ifstream ifs(filePath);
+    std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                         (std::istreambuf_iterator<char>()    ) );
+    RunScript(ctxPtr, content.c_str(), "main.js");
+    RunScript(ctxPtr, "initSurface();", "main.js");
 
     // rest of code goes here
     while (!glfwWindowShouldClose(window)) {
         glfwMakeContextCurrent(window);
-        std::string s1 = "GL.clearColor(0, 0, " + std::to_string(color) + ", 1);";
-        RunScript(ctxPtr, s1.c_str(), "demo.js");
-        RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
+        //std::string s1 = "GL.clearColor(0, 0, " + std::to_string(color) + ", 1);";
+        //RunScript(ctxPtr, s1.c_str(), "demo.js");
+        //RunScript(ctxPtr, "GL.clear(GL.COLOR_BUFFER_BIT);", "demo.js");
+        RunScript(ctxPtr, "drawFrame();", "main.js");
         // glClearColor(0, 0, 1, 1);
         // glClear(GL_COLOR_BUFFER_BIT);
+
         glfwSwapBuffers(window);
 
         if (secondWindow != nullptr && !glfwWindowShouldClose(secondWindow)) {

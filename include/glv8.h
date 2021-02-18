@@ -6,5 +6,6 @@
 using namespace v8;
 
 void bindGL(Isolate *isolate, Local<ObjectTemplate> &gl);
+void bindPlato(Isolate *isolate, Local<ObjectTemplate> &plato);
 
 #endif

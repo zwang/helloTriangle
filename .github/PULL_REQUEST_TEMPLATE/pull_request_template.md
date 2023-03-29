@@ -1,9 +1,8 @@
+---
 title: "[Fix] "
 labels: ["bug"]
-body:
-  - type: markdown
-    attributes:
-      value: |
+---
+
       #### Problems (issue #)
       
       #### Solutions
